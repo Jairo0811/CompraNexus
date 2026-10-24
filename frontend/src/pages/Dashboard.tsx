@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Boxes, Truck, ClipboardList, ArrowRight, Plus } from 'lucide-react';
+import { Building2, Boxes, Truck, ClipboardList, ArrowRight, Plus, Network } from 'lucide-react';
 import { api } from '../api';
 
 type Counts = { departments: number; articles: number; suppliers: number; orders: number };
