@@ -1,10 +1,20 @@
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.venv/
-.env
-data/
-*.sqlite3
-*.db
-.idea/
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+# Node
+**/node_modules/
+**/dist/
+**/coverage/
+**/playwright-report/
+**/test-results/
+# IDE / secrets
+.vs/
 .vscode/
+.idea/
+.env
+.env.*
+!.env.example
+**/appsettings.Development.json
+*.sqlite3

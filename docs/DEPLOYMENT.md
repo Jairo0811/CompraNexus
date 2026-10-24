@@ -1,42 +1,24 @@
-# Guía de despliegue cloud — CompraNexus
+# Despliegue y configuración
 
-**Esto es una guía de preparación, no evidencia de que CompraNexus esté publicado.**
+## Segundo parcial (local)
 
-## Opciones de alojamiento
+Copie `.env.example` a `.env`, cambie `MSSQL_SA_PASSWORD` por una contraseña propia y ejecute:
 
-- Host compatible con Docker (VPS, PaaS, Azure Container Apps, etc.).
-- Puerto interno 8000; configurar el puerto de escucha de plataforma mediante `PORT`.
-- HTTPS gestionado por proxy/PaaS (nunca exponer autenticación básica en HTTP).
-- Almacenamiento **persistente** para SQLite o, preferentemente para un entorno compartido, una base de datos PostgreSQL administrada.
-
-## Variables obligatorias de producción
-
-```text
-APP_ENV=production
-APP_USERNAME=<usuario_admin>
-APP_PASSWORD=<clave_fuerte_y_unica>
-SESSION_SECRET=<valor_aleatorio_largo>
-DATABASE_URL=<url_sqlite_con_volumen_o_postgres>
+```powershell
+docker compose up --build -d
+docker compose ps
 ```
 
-Nunca subir credenciales a Git. Rotarlas al compartir acceso o finalizar la evaluación.
+Interfaz: http://localhost:8088 · API: http://localhost:5098 · Health: http://localhost:5098/health. SQL Server en SSMS: `localhost,1433`, autenticación SQL, usuario `sa`, contraseña del `.env`, base `CompraNexus`. La API crea tablas y datos de demostración en modo Development al conectarse por primera vez.
 
-## Variables opcionales de contabilidad
+Alternativa con SQL Server ya instalado: configure `ConnectionStrings__SqlServer` en entorno, ejecute `dotnet run --project backend/CompraNexus.Api --launch-profile http`, luego en otra consola `cd frontend; npm install; npm run dev`. API: http://localhost:5098, interfaz: http://localhost:5173.
 
-Ver [INTEGRATION.md](INTEGRATION.md). No indicar una URL ficticia o placeholder como servicio real. Mantener `ACCOUNTING_WS_URL` vacío hasta disponer del contrato y credenciales auténticos.
+**Advertencia:** la contraseña de ejemplo NO debe utilizarse sin cambiarla. El puerto de SQL Server está restringido a loopback. No ejecutar `docker compose down -v` salvo que se quiera perder el volumen de datos.
 
-## Validación posterior a publicar
+## Examen final (cloud)
 
-1. `GET /health` responde `{"status":"ok"}`.
-2. Abrir web vía HTTPS, iniciar sesión y verificar los catálogos.
-3. Crear orden con al menos una línea, filtrarla por departamento y empleado.
-4. Crear asientos para orden confirmada, confirmar DB/CR y total.
-5. Solo con otro grupo disponible: probar envío, reintento seguro y verificar en su sistema receptor.
-6. Guardar URL y capturas de la solución para la entrega final.
+Aún sin proveedor ni sitio público. Antes de publicar: implementar autenticación real y roles, secretos gestionados, HTTPS, migraciones EF Core, usuario SQL mínimo privilegio, backups y cadena cifrada con certificado verificable; configurar contrato/URL externa de Contabilidad, validar idempotencia y realizar pruebas de interoperabilidad contra los otros grupos. No afirmar integración remota ni despliegue hasta obtener evidencia.
 
-## Limitaciones conocidas
+## Alcance MVC
 
-- El modelo no incluye aún gestión avanzada de roles, autorización granular ni recuperación de contraseña.
-- `create_all` crea tablas al inicio, pero una modificación del esquema exige migraciones reales (por ejemplo, Alembic).
-- SQLite requiere volumen permanente en cloud; algunos proveedores eliminan el disco entre despliegues.
-- Para despliegues concurrentes, usar PostgreSQL y considerar migraciones/versionado.
+La solución usa React como capa Vista, controladores ASP.NET Core y entidades EF Core. Validar con el profesor si acepta SPA+Web API como interpretación del patrón MVC o exige vistas de ASP.NET Core MVC.

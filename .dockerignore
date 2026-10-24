@@ -1,7 +1,9 @@
-data
-.env
-.venv
-__pycache__
-.pytest_cache
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/coverage
 .git
-tests
+.env
+.env.*
+!/.env.example
