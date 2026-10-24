@@ -1,15 +1,30 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/UNAPEC-ISO--810%20%7C%20ISO--815-0057B8?style=for-the-badge" alt="UNAPEC ISO-810 e ISO-815">
-  <img src="https://img.shields.io/badge/Estado-Desarrollo%20acad%C3%A9mico-f59e0b?style=for-the-badge" alt="Desarrollo académico">
-  <a href="https://github.com/Jairo0811/CompraNexus/actions/workflows/ci.yml"><img src="https://github.com/Jairo0811/CompraNexus/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<div align="center">
+
+# 🛒 CompraNexus
+
+### Sistema de Compras e Interfaz con Contabilidad
+
+**UNAPEC · ISO-810 + ISO-815 · Septiembre–Diciembre 2026**
+
+<p>
+  <img src="https://img.shields.io/badge/UNAPEC-ISO--810%20%7C%20ISO--815-003B70?style=for-the-badge" alt="UNAPEC ISO-810 e ISO-815" />
+  <img src="https://img.shields.io/badge/Estado-Desarrollo%20acad%C3%A9mico-F59E0B?style=for-the-badge" alt="Desarrollo académico" />
+  <a href="https://github.com/Jairo0811/CompraNexus/actions/workflows/ci.yml"><img src="https://github.com/Jairo0811/CompraNexus/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
-# CompraNexus
+**Compras · MVC · Integración HTTP · Contabilidad**
 
-> **Sistema de Compras e Interfaz con Contabilidad** · UNAPEC · Septiembre–diciembre de 2026
+</div>
 
-**CompraNexus** es el proyecto académico único de **ISO-810** e **ISO-815**, bajo la docencia de **Juan Pablo Valdez Reyes**. Implementa los módulos de compras solicitados con una aplicación web MVC open source y prepara la comunicación HTTP con el sistema de Contabilidad.
+---
 
+## 📌 Descripción
+
+**CompraNexus** es el proyecto académico unificado de **ISO-810** e **ISO-815**, impartidas por **Juan Pablo Valdez Reyes** en la Universidad APEC (UNAPEC). Implementa un sistema web de compras bajo patrón MVC y prepara la interoperabilidad HTTP con el sistema de Contabilidad.
+
+La solución cubre catálogos, órdenes de compra, consultas por criterios y generación/transmisión de asientos contables. El código distingue explícitamente lo que está implementado de aquello que todavía requiere **contratos externos, pruebas entre grupos o despliegue cloud verificable**.
+
+---
 ## 🎓 Información académica
 
 | Campo | Información |
@@ -46,7 +61,9 @@ CompraNexus unifica el **proyecto de segundo parcial y examen final** para ambas
 
 Los repositorios anteriores son antecedentes académicos, **no dependencias técnicas**. El proyecto unificado usa un stack open source propio y no implica que SOA-Forge pertenezca a ISO-815 ni que BonitaSoft pertenezca a ISO-810.
 
-## 📋 Estado de entregables
+---
+
+## 📊 Estado académico y entregables
 
 | Entrega | Requisito | Estado de código |
 |---|---|---|
@@ -58,37 +75,109 @@ Los repositorios anteriores son antecedentes académicos, **no dependencias téc
 
 > No confundir funciones implementadas con despliegue ni validación integrada en vivo.
 
+---
+
 ## 🧱 Stack tecnológico
 
-### Backend y API
+### ⚙️ Backend y API
 
-![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white) ![Uvicorn](https://img.shields.io/badge/Uvicorn-ASGI-4051B5) ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)
+<p>
+  <img src="https://skillicons.dev/icons?i=python,fastapi" alt="Python y FastAPI" />
+  <img src="https://img.shields.io/badge/Uvicorn-ASGI-4051B5?style=flat-square" alt="Uvicorn ASGI" />
+  <img src="https://img.shields.io/badge/SQLAlchemy-2.x-D71F00?style=flat-square" alt="SQLAlchemy 2" />
+</p>
 
-### Interfaz MVC
+- **Python 3.12+**;
+- **FastAPI** para rutas HTTP, validación y controladores;
+- **Uvicorn** como servidor ASGI;
+- **SQLAlchemy 2** como ORM;
+- **httpx** para integración HTTP saliente;
+- autenticación HTTP Basic configurable y obligatoria en producción.
 
-![Jinja2](https://img.shields.io/badge/Jinja2-Templates-B41717) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?logo=javascript&logoColor=black)
+### 🎨 Vistas y experiencia web
 
-### Datos e integración
+<p>
+  <img src="https://skillicons.dev/icons?i=html,css,js" alt="HTML5, CSS3 y JavaScript" />
+  <img src="https://img.shields.io/badge/Jinja2-Templates-B41717?style=flat-square" alt="Jinja2 Templates" />
+</p>
 
-![SQLite](https://img.shields.io/badge/SQLite-Local-003B57?logo=sqlite&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Configurable-4169E1?logo=postgresql&logoColor=white) ![HTTP](https://img.shields.io/badge/HTTP-WS%20provisional-64748B) ![httpx](https://img.shields.io/badge/httpx-Cliente%20HTTP-2563EB)
+- **Jinja2** para renderizado server-side;
+- **HTML5**;
+- **CSS responsive**;
+- **JavaScript ES6** para interacción y líneas de detalle;
+- formularios protegidos con CSRF.
 
-### Calidad y despliegue
+### 🗄️ Datos e integración
 
-![pytest](https://img.shields.io/badge/pytest-8%2B-0A9EDC?logo=pytest&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-Preparado-2496ED?logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-2088FF?logo=githubactions&logoColor=white)
+<p>
+  <img src="https://skillicons.dev/icons?i=sqlite,postgres" alt="SQLite y PostgreSQL" />
+  <img src="https://img.shields.io/badge/httpx-HTTP%20Client-2563EB?style=flat-square" alt="httpx" />
+  <img src="https://img.shields.io/badge/WS%20Contabilidad-Contrato%20provisional-64748B?style=flat-square" alt="WS Contabilidad provisional" />
+</p>
 
-**Alcance:** PostgreSQL es configurable, no se declara como despliegue productivo verificado; Docker prepara el empaquetado, no acredita publicación cloud. El contrato HTTP contable es provisional.
+- **SQLite** para evaluación y ejecución local;
+- DATABASE_URL permite **PostgreSQL** para una evolución productiva;
+- adaptador HTTP configurable para Contabilidad;
+- idempotencia y registro persistente de intentos;
+- contrato del WS todavía **provisional**, pendiente del servicio real del otro grupo.
 
-### Patrón MVC
+### 🧪 Calidad, control de versiones y despliegue
 
-- **Modelos:** SQLAlchemy 2 (departamentos, unidades, proveedores, empleados, artículos, órdenes, líneas y asientos).
-- **Controladores:** FastAPI / Python (rutas HTTP, validaciones, operaciones y WS).
-- **Vistas:** Jinja2 HTML, CSS responsive y JavaScript para líneas de detalle.
-- **Persistencia:** SQLite para evaluación local; `DATABASE_URL` acepta PostgreSQL para producción.
-- **Seguridad:** CSRF en formularios; autenticación HTTP Basic configurable y obligatoria en producción; secretos por entorno.
+<p>
+  <img src="https://skillicons.dev/icons?i=docker,git,github,githubactions" alt="Docker, Git, GitHub y GitHub Actions" />
+  <img src="https://img.shields.io/badge/pytest-8%2B-0A9EDC?style=flat-square&logo=pytest&logoColor=white" alt="pytest" />
+</p>
 
-Se usa tecnología open source conforme al requisito, priorizando un monolito MVC reproducible. La elección de SQLite/PostgreSQL y Python es una **decisión técnica del equipo**, no una imposición del enunciado.
+- **pytest** para pruebas automatizadas;
+- compileall como validación adicional del código Python;
+- **Git / GitHub**;
+- **GitHub Actions** para CI;
+- **Dockerfile** para empaquetado reproducible;
+- preparación para cloud sin declarar un despliegue todavía no verificado.
 
-## Requisitos del profesor
+> **Alcance técnico:** que PostgreSQL sea configurable o que exista un Dockerfile no significa que CompraNexus ya esté desplegado en producción. La publicación cloud y la integración real entre grupos siguen requiriendo evidencia externa.
+
+### 🧩 Patrón MVC
+
+| Capa | Implementación |
+|---|---|
+| **Modelos** | SQLAlchemy 2: departamentos, unidades, proveedores, empleados, artículos, órdenes, líneas y asientos |
+| **Controladores** | FastAPI / Python: rutas HTTP, validaciones, operaciones y comunicación con WS |
+| **Vistas** | Jinja2 + HTML + CSS + JavaScript |
+| **Persistencia** | SQLite local; PostgreSQL configurable mediante DATABASE_URL |
+| **Seguridad** | CSRF, HTTP Basic configurable y secretos por entorno |
+
+Se utiliza tecnología **open source** conforme al requisito académico. La selección de Python, FastAPI, SQLite/PostgreSQL y Jinja2 es una decisión técnica del equipo, no una imposición del enunciado.
+
+---
+
+## 🏗️ Arquitectura
+
+```text
+Navegador
+   │
+   │ HTTP
+   ▼
+FastAPI / Controllers
+   │
+   ├──────────────► Jinja2 Views
+   │
+   ▼
+SQLAlchemy Models
+   │
+   ├──────────────► SQLite (local)
+   │
+   └──────────────► PostgreSQL (configurable)
+   │
+   ▼
+Accounting Adapter / httpx
+   │
+   ▼
+WS Contabilidad
+(contrato externo pendiente)
+```
+
+## 📋 Requisitos del profesor
 
 - Departamentos: ID, nombre, estado.
 - Unidades de medida: ID, descripción, estado.
@@ -100,7 +189,11 @@ Se usa tecnología open source conforme al requisito, priorizando un monolito MV
 
 **Ampliaciones útiles:** catálogo de empleados, encabezado con departamento/proveedor, detalles múltiples, búsqueda y confirmación de órdenes, estado de transmisión contable.
 
-## Iniciar en Windows (PowerShell)
+---
+
+## 🚀 Ejecución local
+
+### Windows (PowerShell)
 
 Requiere **Python 3.12+**.
 
@@ -126,7 +219,9 @@ python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
-## Menú del sistema
+---
+
+## 🧭 Módulos y navegación
 
 | Módulo | Ruta |
 |---|---|
@@ -143,7 +238,9 @@ uvicorn app.main:app --reload
 
 Para registrar una orden primero cree un departamento, una unidad, un proveedor, un empleado asignado al departamento y al menos un artículo.
 
-## Pruebas
+---
+
+## 🧪 Pruebas y CI
 
 ```bash
 pytest -q
@@ -152,7 +249,9 @@ python -m compileall -q app scripts
 
 GitHub Actions ejecuta las pruebas al hacer push/PR.
 
-## Deploy (preparación)
+---
+
+## ☁️ Despliegue — preparación
 
 ```bash
 docker build -t compranexus .
@@ -161,5 +260,18 @@ docker run --rm -p 8000:8000 -e APP_ENV=production -e APP_USERNAME=admin -e APP_
 
 Para publicar en una plataforma cloud, usar **HTTPS**, un servicio Docker con almacenamiento persistente (o PostgreSQL en `DATABASE_URL`) y secretos configurados. El contenedor no publica por sí mismo el proyecto. Sin URL ni contrato del WS, los asientos se guardan como Pendiente y **no se envían**.
 
-Documentación: [trazabilidad académica](docs/REQUIREMENTS.md) · [contrato de integración](docs/INTEGRATION.md) · [despliegue](docs/DEPLOYMENT.md).
+## 📚 Documentación
+
+- [Trazabilidad académica](docs/REQUIREMENTS.md)
+- [Contrato propuesto de integración con Contabilidad](docs/INTEGRATION.md)
+- [Guía de despliegue](docs/DEPLOYMENT.md)
+
+---
+
+<div align="center">
+
+**CompraNexus · Sistema de Compras e Interfaz con Contabilidad**  
+**UNAPEC · ISO-810 + ISO-815 · 2026**
+
+</div>
 
