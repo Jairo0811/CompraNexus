@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div><span class="eyebrow">CENTRO DE OPERACIONES</span><h2>Compras conectadas.<br>Procesos inteligentes.</h2>
+  <p>Administra proveedores, catálogos y órdenes desde un único espacio de trabajo.</p>
+  <a class="btn light" href="/orders/new">+ Crear orden de compra</a></div>
+  <div class="hero-icon">◈<span>↗</span></div>
+</section>
+<div class="kpis">
+  <a class="kpi" href="/catalogs/departments"><span>Departamentos</span><strong>{{ metrics.departments }}</strong><small>Unidades organizacionales</small></a>
+  <a class="kpi" href="/catalogs/articles"><span>Artículos</span><strong>{{ metrics.articles }}</strong><small>Productos registrados</small></a>
+  <a class="kpi" href="/catalogs/suppliers"><span>Proveedores</span><strong>{{ metrics.suppliers }}</strong><small>Directorio comercial</small></a>
+  <a class="kpi" href="/orders"><span>Órdenes de compra</span><strong>{{ metrics.orders }}</strong><small>Documentos generados</small></a>
+</div>
+<section class="panel">
+  <div class="panel-head"><div><h2>Órdenes recientes</h2><p>Últimas transacciones registradas</p></div><a class="link" href="/orders">Ver todas →</a></div>
+  <div class="tablewrap"><table><thead><tr><th>Número</th><th>Fecha</th><th>Departamento</th><th>Proveedor</th><th>Estado</th><th class="right">Total (RD$)</th></tr></thead>
+  <tbody>{% for item in orders %}<tr><td><b>{{ item.number }}</b></td><td>{{ item.order_date }}</td><td>{{ item.department.name }}</td><td>{{ item.supplier.commercial_name }}</td><td><span class="chip">{{ item.status }}</span></td><td class="right">{{ "%.2f"|format(item.total) }}</td></tr>
+  {% else %}<tr><td colspan="6" class="empty">Todavía no hay órdenes. <a href="/orders/new">Crear la primera</a></td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

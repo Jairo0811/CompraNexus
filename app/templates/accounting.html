@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel">
+ <div class="panel-head"><div><h2>Asientos contables vía WS</h2><p>Integración de órdenes confirmadas con el sistema de Contabilidad.</p></div>
+ <form method="post" action="/accounting/retry"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="btn" type="submit">Reintentar pendientes</button></form></div>
+ <div class="hint {{ 'good' if configured else '' }}">{{ "Servicio contable configurado. Los resultados se reflejan por asiento." if configured else "El servicio externo todavía no está configurado: los asientos quedan en Pendiente y NO se envían." }}</div>
+ <div class="tablewrap"><table><thead><tr><th>Asiento (UUID)</th><th>Orden</th><th>Movimiento</th><th>Cuenta</th><th>Tipo inventario</th><th>Fecha</th><th class="right">Monto</th><th>Estado</th><th>Intentos</th></tr></thead><tbody>
+ {% for e in entries %}<tr><td class="monosmall">{{ e.journal_id }}</td><td>{{ e.order.number }}</td><td><span class="chip">{{ e.movement }}</span></td><td>{{ e.account }}</td><td>{{ e.inventory_type_id }}</td><td>{{ e.entry_date }}</td><td class="right">{{ "%.2f"|format(e.amount) }}</td><td><span class="chip">{{ e.status }}</span></td><td>{{ e.attempts }}</td></tr>
+ {% else %}<tr><td colspan="9" class="empty">Aún no se han generado asientos. Confirma una orden y selecciona «Contabilizar».</td></tr>{% endfor %}
+ </tbody></table></div>
+</section>
+{% endblock %}
