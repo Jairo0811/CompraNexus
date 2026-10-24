@@ -7,7 +7,7 @@ test('CompraNexus opens dashboard and navigates to purchasing modules', async ({
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   await expect(page.getByText('Compras conectadas.')).toBeVisible();
   await page.getByRole('link', { name: 'Departamentos' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Departamentos' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Departamentos', exact: true })).toBeVisible();
   await expect(page.getByText('Tecnología')).toBeVisible();
   await page.getByRole('button', { name: 'Nuevo registro' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
