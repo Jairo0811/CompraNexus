@@ -59,14 +59,86 @@ Las membresías se conservan por asignatura y se muestran ordenadas por matrícu
 
 ## 🧭 Continuidad académica
 
-CompraNexus reutiliza una única solución para los entregables actuales de ISO-810 e ISO-815, pero mantiene separada la procedencia académica de los trabajos anteriores.
+CompraNexus representa la continuidad de varias relaciones académicas verificadas en UNAPEC. La continuidad se documenta de forma **académica, docente y cronológica**; no implica que los proyectos anteriores sean dependencias técnicas de CompraNexus.
 
-| Asignatura | Trabajo anterior | Proyecto actual |
-|---|---|---|
-| **ISO-810** | [SOA-Forge](https://github.com/Jairo0811/SOA-Forge) — Akana SOA | **CompraNexus** |
-| **ISO-815** | [BonitaSoft](https://github.com/Jairo0811/BonitaSoft) — Bonita BPM | **CompraNexus** |
+### 📚 Continuidad por asignatura y entregables
 
-**SOA-Forge y BonitaSoft son antecedentes académicos independientes, no dependencias técnicas de CompraNexus.** Esto tampoco implica que SOA-Forge pertenezca a ISO-815 ni que BonitaSoft pertenezca a ISO-810.
+Durante **Septiembre–Diciembre 2026**, ISO-810 e ISO-815 comenzaron con proyectos independientes para el primer parcial y posteriormente convergen en **CompraNexus** para el segundo parcial y el examen final.
+
+| Asignatura | Etapa anterior | Proyecto anterior | Continuidad |
+|---|---|---|---|
+| **ISO-810 — Integración de Aplicaciones con Tecnología Propietaria** | Primer parcial | [**SOA-Forge**](https://github.com/Jairo0811/SOA-Forge) — Akana SOA | **CompraNexus** — segundo parcial y final |
+| **ISO-815 — Integración de Aplicaciones con Tecnología Open Source** | Primer parcial | [**BonitaSoft**](https://github.com/Jairo0811/BonitaSoft) — Bonita BPM | **CompraNexus** — segundo parcial y final |
+
+**SOA-Forge pertenece exclusivamente a ISO-810 y BonitaSoft exclusivamente a ISO-815.** CompraNexus es la solución compartida para las entregas posteriores de ambas asignaturas.
+
+### 👥 Continuidad por compañeros
+
+La composición de CompraNexus conserva las membresías originales de ambos grupos y permite documentar varias coincidencias académicas previas con **Francis Jairo Matías Rosario (A00115261)**.
+
+| Compañero | Matrícula | Coincidencias académicas verificadas | Participación en CompraNexus |
+|---|---|---|---|
+| **Jorge Alexander Minier Terrero** | **A00105678** | SOA-Forge / ISO-810 y BonitaSoft / ISO-815 — Septiembre–Diciembre 2026 | **ISO-810 + ISO-815** |
+| **Eliandres Rodríguez Cepeda** | **A00112070** | [Kognia](https://github.com/Jairo0811/Kognia) / ISO-700 — Mayo–Agosto 2024; BonitaSoft / ISO-815 — Septiembre–Diciembre 2026 | **Solo ISO-815** |
+| **Enmanueli Alfonso Rondón Marrero** | **A00115575** | SOA-Forge / ISO-810 y BonitaSoft / ISO-815 — Septiembre–Diciembre 2026 | **ISO-810 + ISO-815** |
+
+#### Eliandres Rodríguez Cepeda
+
+Eliandres ya había coincidido con Francis en [**Kognia**](https://github.com/Jairo0811/Kognia), proyecto de **Gestión de Sitios Web (ISO-700)** durante **Mayo–Agosto 2024**. Ambos vuelven a coincidir en **BonitaSoft / ISO-815** y posteriormente continúan juntos en **CompraNexus** dentro de ISO-815.
+
+```text
+Kognia — ISO-700 — Mayo–Agosto 2024
+              │
+              ▼
+BonitaSoft — ISO-815 — Septiembre–Diciembre 2026
+              │
+              ▼
+CompraNexus — ISO-815 — Septiembre–Diciembre 2026
+```
+
+> Eliandres **no pertenece a ISO-810 ni a SOA-Forge**.
+
+#### Jorge Alexander Minier Terrero y Enmanueli Alfonso Rondón Marrero
+
+Jorge y Enmanueli coinciden con Francis en los dos grupos del período **Septiembre–Diciembre 2026**: **SOA-Forge / ISO-810** y **BonitaSoft / ISO-815**. Ambos continúan en CompraNexus como integrantes de las dos asignaturas.
+
+```text
+              ┌─ SOA-Forge — ISO-810 ─┐
+Jorge ────────┤                        ├──► CompraNexus — ISO-810 + ISO-815
+Francis ──────┤                        │
+Enmanueli ────┤                        │
+              └─ BonitaSoft — ISO-815 ┘
+```
+
+No se infieren coincidencias anteriores adicionales para Jorge o Enmanueli sin evidencia documental.
+
+### 👨‍🏫 Continuidad por profesor
+
+El profesor **Juan Pablo Valdez Reyes** también mantiene una continuidad académica directa con Francis y con los proyectos que desembocan en CompraNexus.
+
+| Orden | Asignatura / etapa | Proyecto | Período |
+|---:|---|---|---|
+| 1 | **Desarrollo de Software con Tecnología Open Source 2 (ISO-715)** | [**RentCarRD**](https://github.com/Jairo0811/RentCarRD) | Mayo–Agosto 2026 |
+| 2 | **Integración de Aplicaciones con Tecnología Propietaria (ISO-810)** — primer parcial | [**SOA-Forge**](https://github.com/Jairo0811/SOA-Forge) | Septiembre–Diciembre 2026 |
+| 3 | **Integración de Aplicaciones con Tecnología Open Source (ISO-815)** — primer parcial | [**BonitaSoft**](https://github.com/Jairo0811/BonitaSoft) | Septiembre–Diciembre 2026 |
+| 4 | **ISO-810 + ISO-815** — segundo parcial y examen final | **CompraNexus** | Septiembre–Diciembre 2026 |
+
+```text
+RentCarRD — ISO-715 — Mayo–Agosto 2026
+                    │
+                    ▼
+        Juan Pablo Valdez Reyes
+             Sept.–Dic. 2026
+            ┌───────┴────────┐
+            ▼                ▼
+   SOA-Forge / ISO-810   BonitaSoft / ISO-815
+            └───────┬────────┘
+                    ▼
+              CompraNexus
+             ISO-810 + ISO-815
+```
+
+La relación entre **RentCarRD, SOA-Forge, BonitaSoft y CompraNexus** es **docente, formativa y cronológica**. Cada proyecto conserva su propio alcance y arquitectura.
 
 ---
 
