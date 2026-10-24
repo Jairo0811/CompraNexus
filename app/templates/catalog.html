@@ -4,7 +4,7 @@
  <div class="panel-head"><div><h2>Gestión de {{ title|lower }}</h2><p>{{ count }} registro(s) · Crear, consultar, modificar y eliminar</p></div><a href="/catalogs/{{ kind }}/new" class="btn">+ Nuevo registro</a></div>
  <form class="search" method="get"><label for="q" class="sr-only">Buscar</label><input id="q" name="q" value="{{ q }}" placeholder="Buscar en este módulo..." /><button type="submit" class="btn ghost">Buscar</button>{% if q %}<a href="/catalogs/{{ kind }}" class="btn ghost">Limpiar</a>{% endif %}</form>
  <div class="tablewrap"><table><thead><tr><th>ID</th>{% for col, label in columns %}<th>{{ label }}</th>{% endfor %}<th class="right">Acciones</th></tr></thead>
- <tbody>{% for row in rows %}<tr><td>#{{ row.id }}</td>{% for val in row.values %}<td>{{ val }}</td>{% endfor %}
+ <tbody>{% for row in rows %}<tr><td>#{{ row.id }}</td>{% for val in row['values'] %}<td>{{ val }}</td>{% endfor %}
  <td class="right actions"><a class="btn ghost small" href="/catalogs/{{ kind }}/{{ row.id }}/edit">Editar</a>
  <form method="post" action="/catalogs/{{ kind }}/{{ row.id }}/delete" onsubmit="return confirm('¿Eliminar este registro? Si tiene relaciones, se desactivará para proteger los datos.');"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="btn danger small" type="submit">Eliminar</button></form></td></tr>
  {% else %}<tr><td colspan="{{ columns|length + 2 }}" class="empty">Sin registros. Utiliza «Nuevo registro» para comenzar.</td></tr>{% endfor %}</tbody></table></div>
