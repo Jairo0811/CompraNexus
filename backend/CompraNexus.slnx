@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CompraNexus.Api/CompraNexus.Api.csproj" />
+  <Project Path="CompraNexus.Tests/CompraNexus.Tests.csproj" />
+</Solution>

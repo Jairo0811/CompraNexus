@@ -1,20 +1,41 @@
 name: CompraNexus CI
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/**']
   pull_request:
 jobs:
-  test:
+  dotnet:
+    name: API .NET 10 / xUnit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-dotnet@v4
         with:
-          python-version: '3.12'
-          cache: pip
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Compile source
-        run: python -m compileall -q app scripts
-      - name: Run tests
-        run: python -m pytest -q
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore backend/CompraNexus.slnx
+      - name: Build
+        run: dotnet build backend/CompraNexus.slnx -c Release --no-restore
+      - name: xUnit tests
+        run: dotnet test backend/CompraNexus.slnx -c Release --no-build --verbosity normal
+  frontend:
+    name: React / Vitest / Playwright
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Build TypeScript and Vite
+        run: npm run build
+      - name: Vitest tests
+        run: npm run test
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser smoke tests
+        run: npm run test:e2e

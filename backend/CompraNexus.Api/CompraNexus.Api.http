@@ -1,0 +1,14 @@
+@host = http://localhost:5098
+GET {{host}}/health
+
+###
+GET {{host}}/api/dashboard
+
+###
+GET {{host}}/api/departments
+
+###
+GET {{host}}/api/purchase-orders
+
+###
+GET {{host}}/api/accounting
