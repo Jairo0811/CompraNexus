@@ -204,9 +204,20 @@ public class SqlServerIntegrationTests : SqlServerTestBase
     [SqlServerFact]
     public async Task ForeignKeys_PreventDeletingReferencedDepartment()
     {
-        await using var db = NewDb();
-        await SeedAsync(db);
-        db.Departments.Remove(await db.Departments.SingleAsync());
-        await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
+        // Sembrar y cerrar el contexto: un dependiente rastreado puede provocar
+        // InvalidOperationException en EF Core ANTES de ejecutar el DELETE SQL.
+        await using (var setup = NewDb())
+            await SeedAsync(setup);
+
+        // Este contexto solo rastrea al Department: el servidor debe rechazar
+        // el DELETE debido a la FK real de Employees (SQL Server error 547).
+        await using var delete = NewDb();
+        delete.Departments.Remove(await delete.Departments.SingleAsync());
+        var error = await Assert.ThrowsAsync<DbUpdateException>(() => delete.SaveChangesAsync());
+        Assert.Equal(547, Assert.IsType<Microsoft.Data.SqlClient.SqlException>(error.InnerException).Number);
+
+        await using var verify = NewDb();
+        Assert.Equal(1, await verify.Departments.CountAsync());
+        Assert.Equal(1, await verify.Employees.CountAsync());
     }
 }
