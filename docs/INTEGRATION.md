@@ -21,3 +21,16 @@ Se necesita coordinar con el equipo de Contabilidad antes de declarar compatible
 ```
 
 El receptor debe respetar `Idempotency-Key` para evitar duplicados cuando hay timeout o reintento. Un HTTP 2xx no demuestra aceptación contable semántica sin respuesta contractual validada.
+
+## Contabilización: semántica de la respuesta y duplicados
+
+`POST /api/purchase-orders/{id}/accounting` devuelve `{ created, pending, sent, configured }`:
+
+- `created`: asientos **nuevos** creados en esa solicitud (2 la primera vez, 0 después).
+- `pending`: asientos de la orden que siguen sin enviarse.
+- `sent`: asientos transmitidos con éxito en esa solicitud.
+
+Existe un índice único `(PurchaseOrderId, Movement)` para impedir más de un DB y un CR por orden aunque
+lleguen solicitudes concurrentes. En bases ya creadas con `EnsureCreated` se aplica de forma aditiva al
+arrancar en Development (`SchemaPatches`) o manualmente con `scripts/sql/001-accounting-unique-index.sql`.
+Sigue siendo un contrato **provisional**: no hay integración externa verificada.

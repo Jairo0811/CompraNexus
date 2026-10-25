@@ -46,9 +46,12 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, Accounting
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] PurchaseOrderInput input)
     {
+        if (!OrderRules.CanCreateAs(input.Status))
+            return BadRequest(new { message = "Una orden nueva solo puede crearse como Borrador o Confirmada." });
         var error = await ValidateInput(input);
         if (error is not null) return BadRequest(new { message = error });
-        if (await db.PurchaseOrders.AnyAsync(x => x.Number == input.Number))
+        var number = input.Number.Trim();
+        if (await db.PurchaseOrders.AnyAsync(x => x.Number == number))
             return Conflict(new { message = "El número de orden ya existe." });
         var order = new PurchaseOrder();
         Apply(order, input);
@@ -65,9 +68,14 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, Accounting
             .FirstOrDefaultAsync(x => x.Id == id);
         if (order is null) return NotFound();
         if (order.AccountingEntries.Count != 0) return Conflict(new { message = "La orden ya tiene asientos; no puede editarse." });
+        if (!OrderRules.CanTransition(order.Status, input.Status))
+            return Conflict(new { message = order.Status == "Anulada"
+                ? "Una orden anulada no puede modificarse."
+                : $"Transición de estado no permitida: {order.Status} → {input.Status}." });
         var error = await ValidateInput(input);
         if (error is not null) return BadRequest(new { message = error });
-        if (await db.PurchaseOrders.AnyAsync(x => x.Number == input.Number && x.Id != id))
+        var number = input.Number.Trim();
+        if (await db.PurchaseOrders.AnyAsync(x => x.Number == number && x.Id != id))
             return Conflict(new { message = "El número de orden ya existe." });
         db.PurchaseOrderLines.RemoveRange(order.Lines);
         order.Lines.Clear();
@@ -95,11 +103,13 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, Accounting
     {
         var order = await db.PurchaseOrders.FindAsync([id], ct);
         if (order is null) return NotFound();
-        try { await accounting.PrepareAsync(order, ct); }
+        int created;
+        try { created = await accounting.PrepareAsync(order, ct); }
         catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         var entries = await db.AccountingEntries.Where(x => x.PurchaseOrderId == id && x.Status != "Enviado").ToListAsync(ct);
-        var count = await accounting.TransmitAsync(entries, ct);
-        return Ok(new { created = entries.Count, sent = count, configured = accounting.Configured });
+        var sent = await accounting.TransmitAsync(entries, ct);
+        // Created = solo asientos nuevos de esta solicitud; Pending = los que siguen sin enviarse.
+        return Ok(new AccountingResult(created, entries.Count - sent, sent, accounting.Configured));
     }
 
     private async Task<string?> ValidateInput(PurchaseOrderInput input)
@@ -108,6 +118,8 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, Accounting
         if (input.Lines is null || input.Lines.Count == 0) return "La orden requiere al menos un artículo.";
         if (input.Lines.Any(l => l.Quantity <= 0 || l.UnitCost < 0 || l.ArticleId <= 0))
             return "Cantidad y costo inválidos.";
+        if (input.Lines.Any(l => decimal.Round(l.UnitCost, 2) != l.UnitCost))
+            return "El costo unitario admite como máximo 2 decimales.";
         if (!await db.Departments.AnyAsync(d => d.Id == input.DepartmentId && d.Status == "Activo"))
             return "Departamento no válido.";
         if (!await db.Employees.AnyAsync(e => e.Id == input.EmployeeId && e.DepartmentId == input.DepartmentId && e.Status == "Activo"))

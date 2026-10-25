@@ -72,7 +72,14 @@ public sealed class AccountingGateway(
                 EntryDate = order.OrderDate,
                 Amount = total
             });
-        await db.SaveChangesAsync(ct);
+        try { await db.SaveChangesAsync(ct); }
+        catch (DbUpdateException)
+        {
+            // Otra solicitud concurrente pudo crear el par DB/CR primero (índice único por orden y movimiento).
+            db.ChangeTracker.Clear();
+            if (await db.AccountingEntries.AsNoTracking().AnyAsync(a => a.PurchaseOrderId == order.Id, ct)) return 0;
+            throw;
+        }
         return 2;
     }
 }

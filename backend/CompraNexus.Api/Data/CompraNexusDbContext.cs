@@ -21,6 +21,8 @@ public sealed class CompraNexusDbContext(DbContextOptions<CompraNexusDbContext> 
         model.Entity<Supplier>().HasIndex(x => x.TaxId).IsUnique();
         model.Entity<PurchaseOrder>().HasIndex(x => x.Number).IsUnique();
         model.Entity<AccountingEntry>().HasIndex(x => x.JournalId).IsUnique();
+        // Un solo DB y un solo CR por orden: evita duplicados ante solicitudes concurrentes.
+        model.Entity<AccountingEntry>().HasIndex(x => new { x.PurchaseOrderId, x.Movement }).IsUnique();
         model.Entity<Employee>().HasOne<Department>().WithMany().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.Restrict);
         model.Entity<Article>().HasOne<UnitMeasure>().WithMany().HasForeignKey(x => x.UnitMeasureId).OnDelete(DeleteBehavior.Restrict);
         model.Entity<PurchaseOrder>().HasOne(x => x.Department).WithMany().OnDelete(DeleteBehavior.Restrict);

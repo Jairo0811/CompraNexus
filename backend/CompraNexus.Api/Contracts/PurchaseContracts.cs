@@ -16,8 +16,9 @@ public sealed class PurchaseOrderInput
 public sealed class PurchaseOrderLineInput
 {
     [Range(1, int.MaxValue)] public int ArticleId { get; set; }
-    [Range(1, int.MaxValue)] public int Quantity { get; set; }
-    [Range(typeof(decimal), "0", "9999999999999999")] public decimal UnitCost { get; set; }
+    [Range(1, 1_000_000)] public int Quantity { get; set; }
+    [Range(typeof(decimal), "0", "99999999.99", ParseLimitsInInvariantCulture = true, ConvertValueInInvariantCulture = true)]
+    public decimal UnitCost { get; set; }
 }
 
 public sealed record PurchaseOrderLineView(int Id, int ArticleId, string Article, int UnitMeasureId,
@@ -27,3 +28,6 @@ public sealed record PurchaseOrderView(int Id, string Number, DateOnly OrderDate
     int SupplierId, string Supplier, decimal Total, List<PurchaseOrderLineView> Lines);
 
 public sealed record DashboardCounts(int Departments, int Articles, int Suppliers, int Orders);
+
+/// <summary>Resultado de contabilizar una orden: <c>Created</c> cuenta solo asientos nuevos de esta solicitud.</summary>
+public sealed record AccountingResult(int Created, int Pending, int Sent, bool Configured);

@@ -44,6 +44,7 @@ if (app.Environment.IsDevelopment())
         {
             await db.Database.EnsureCreatedAsync();
             await DevelopmentSeed.RunAsync(db);
+            await SchemaPatches.ApplyAsync(db, app.Logger);
             break;
         }
         catch (Exception ex) when (i < 39 && (ex is Microsoft.Data.SqlClient.SqlException || ex is InvalidOperationException))

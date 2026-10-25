@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link2, RefreshCw } from 'lucide-react';
-import { api, moneyRD } from '../api';
+import { api, errorMessage, moneyRD } from '../api';
 import type { AccountingEntry } from '../types';
 
 export function Accounting() {
@@ -12,12 +12,12 @@ export function Accounting() {
     const result = await api<{configured: boolean; entries: AccountingEntry[]}>('/accounting');
     setEntries(result.entries); setConfigured(result.configured);
   };
-  useEffect(() => { void load().catch(e => setError(String(e))); }, []);
+  useEffect(() => { void load().catch(e => setError(errorMessage(e))); }, []);
   const retry = async () => {
     try {
       const result = await api<{ sent: number }>('/accounting/retry', { method: 'POST' });
       setNotice('Asientos enviados: ' + result.sent); setError(''); await load();
-    } catch (e) { setError(String(e)); }
+    } catch (e) { setError(errorMessage(e)); }
   };
   return <>
     {notice && <div className="alert success">{notice}</div>}

@@ -38,9 +38,9 @@ public sealed class DashboardController(CompraNexusDbContext db) : ControllerBas
     [HttpGet]
     public async Task<IActionResult> Get() => Ok(new
     {
-        departments = await db.Departments.CountAsync(),
-        articles = await db.Articles.CountAsync(),
-        suppliers = await db.Suppliers.CountAsync(),
+        departments = await db.Departments.CountAsync(x => x.Status == "Activo"),
+        articles = await db.Articles.CountAsync(x => x.Status == "Activo"),
+        suppliers = await db.Suppliers.CountAsync(x => x.Status == "Activo"),
         orders = await db.PurchaseOrders.CountAsync(),
     });
 }
