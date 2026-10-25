@@ -16,6 +16,18 @@ jobs:
         run: dotnet restore backend/CompraNexus.slnx
       - name: Build
         run: dotnet build backend/CompraNexus.slnx -c Release --no-restore
+      - name: Start SQL Server (efímero, solo CI)
+        run: |
+          SA_PASSWORD="Ci-$(openssl rand -hex 12)-Aa1!"
+          echo "::add-mask::$SA_PASSWORD"
+          docker run -d --name ci-sql -p 14330:1433 -e ACCEPT_EULA=Y -e "MSSQL_SA_PASSWORD=$SA_PASSWORD" mcr.microsoft.com/mssql/server:2022-latest
+          echo "COMPRANEXUS_TEST_SQL=Server=localhost,14330;User Id=sa;Password=$SA_PASSWORD;TrustServerCertificate=True;Encrypt=True" >> "$GITHUB_ENV"
+          for i in $(seq 1 60); do
+            if docker logs ci-sql 2>&1 | grep -q "SQL Server is now ready for client connections"; then exit 0; fi
+            sleep 2
+          done
+          docker logs ci-sql
+          exit 1
       - name: xUnit tests
         run: dotnet test backend/CompraNexus.slnx -c Release --no-build --verbosity normal
   frontend:
