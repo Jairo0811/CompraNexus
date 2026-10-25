@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Search, RotateCcw } from 'lucide-react';
-import { api, moneyRD } from '../api';
+import { api, errorMessage, moneyRD } from '../api';
 import type { Lookup, Order } from '../types';
 
 export function Reports() {
@@ -11,22 +11,25 @@ export function Reports() {
   const [emp, setEmp] = useState('');
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     Promise.all([api<Lookup[]>('/departments'), api<Lookup[]>('/employees')])
-      .then(([d,e]) => { setDepartments(d); setEmployees(e); }).catch(e => setError(String(e)));
+      .then(([d,e]) => { setDepartments(d); setEmployees(e); }).catch(e => setError(errorMessage(e)));
   }, []);
   const search = async (department = dep, employee = emp, selectedStatus = status) => {
     const p = new URLSearchParams();
     if (department) p.set('departmentId', department);
     if (employee) p.set('employeeId', employee);
     if (selectedStatus) p.set('status', selectedStatus);
+    setLoading(true);
     try { setOrders(await api<Order[]>('/purchase-orders?' + p)); setError(''); }
-    catch (e) { setError(String(e)); }
+    catch (e) { setError(errorMessage(e)); }
+    finally { setLoading(false); }
   };
   useEffect(() => { void search('', '', ''); }, []);
   const clear = () => { setDep(''); setEmp(''); setStatus(''); void search('', '', ''); };
   return <>
-    {error && <div className="alert error">{error}</div>}
+    {error && <div className="alert error" role="alert">{error}</div>}
     <section className="panel">
       <div className="panel-title"><div><h2>Consulta por criterios</h2><p>Órdenes filtradas por departamento, empleado y estado</p></div></div>
       <form className="filters" onSubmit={(e: FormEvent) => { e.preventDefault(); void search(); }}>
@@ -38,7 +41,8 @@ export function Reports() {
       </form>
       <div className="table-scroll"><table><thead><tr><th>Número</th><th>Fecha</th><th>Departamento</th><th>Empleado</th><th>Proveedor</th><th>Estado</th><th className="align-right">Total</th></tr></thead>
         <tbody>{orders.map(o => <tr key={o.id}><td><strong>{o.number}</strong></td><td>{o.orderDate}</td><td>{o.department}</td><td>{o.employee}</td><td>{o.supplier}</td><td><span className="pill">{o.status}</span></td><td className="align-right">{moneyRD(o.total)}</td></tr>)}
-        {orders.length === 0 && <tr><td colSpan={7} className="empty">No se encontraron órdenes para los criterios seleccionados.</td></tr>}
+        {loading && <tr><td colSpan={7} className="loading">Consultando órdenes...</td></tr>}
+        {!loading && orders.length === 0 && <tr><td colSpan={7} className="empty">No se encontraron órdenes para los criterios seleccionados.</td></tr>}
         </tbody></table></div>
       <div className="panel-bottom">{orders.length} resultado(s) · Total: <strong>{moneyRD(orders.reduce((sum,o) => sum + o.total, 0))}</strong></div>
     </section>

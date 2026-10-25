@@ -18,3 +18,10 @@
 !.env.example
 **/appsettings.Development.json
 *.sqlite3
+
+# Archivos locales
+*.patch
+docker-compose.local*.yml
+*.backup.yml
+Windows PowerShell.txt
+frontend/tsconfig.tsbuildinfo
