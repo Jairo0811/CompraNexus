@@ -7,47 +7,70 @@ using Microsoft.EntityFrameworkCore;
 namespace CompraNexus.Api.Services;
 
 public sealed class AccountingGateway(
-    HttpClient client, IConfiguration configuration, CompraNexusDbContext db)
+    HttpClient client, IConfiguration configuration, CompraNexusDbContext db) : IAccountingGateway
 {
+    private const int DefaultMaxAttempts = 5;
+    // Serializa envíos dentro del proceso; entre procesos protege la Idempotency-Key (JournalId).
+    private static readonly SemaphoreSlim Gate = new(1, 1);
     private readonly string? url = configuration["Accounting:ServiceUrl"];
     public bool Configured => !string.IsNullOrWhiteSpace(url);
 
+    private int MaxAttempts =>
+        int.TryParse(configuration["Accounting:MaxAttempts"], out var n) && n > 0 ? n : DefaultMaxAttempts;
+
+    private static string Truncate(string text) => text[..Math.Min(text.Length, 1900)];
+
+    /// <summary>Envía los asientos reintentables. Un 4xx (salvo 408/429) pasa a Rechazado y no se reintenta;
+    /// 5xx, timeout y errores de red quedan en Error y se reintentan hasta MaxAttempts con la misma Idempotency-Key.</summary>
     public async Task<int> TransmitAsync(IEnumerable<AccountingEntry> entries, CancellationToken ct)
     {
         if (!Configured) return 0;
         var delivered = 0;
-        foreach (var entry in entries)
+        await Gate.WaitAsync(ct);
+        try
         {
-            if (entry.Status == "Enviado") continue;
-            var payload = new
+            foreach (var entry in entries)
             {
-                identificadorAsiento = entry.JournalId,
-                descripcion = entry.Description,
-                identificadorTipoInventario = entry.InventoryTypeId,
-                cuentaContable = entry.Account,
-                tipoMovimiento = entry.Movement,
-                fechaAsiento = entry.EntryDate.ToString("yyyy-MM-dd"),
-                montoAsiento = entry.Amount,
-                estado = "Activo"
-            };
-            entry.Attempts++;
-            try
-            {
-                using var req = new HttpRequestMessage(HttpMethod.Post, url);
-                req.Headers.TryAddWithoutValidation("Idempotency-Key", entry.JournalId.ToString());
-                if (!string.IsNullOrEmpty(configuration["Accounting:BearerToken"]))
-                    req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", configuration["Accounting:BearerToken"]);
-                req.Content = JsonContent.Create(payload);
-                using var res = await client.SendAsync(req, ct);
-                var responseText = await res.Content.ReadAsStringAsync(ct);
-                entry.Response = responseText[..Math.Min(responseText.Length, 1900)];
-                if (res.IsSuccessStatusCode) { entry.Status = "Enviado"; delivered++; }
-                else entry.Status = "Error";
+                // Estado fresco: otra solicitud pudo enviarlo mientras esperábamos el turno.
+                await db.Entry(entry).ReloadAsync(ct);
+                if (!AccountingStatus.IsRetryable(entry.Status, entry.Attempts, MaxAttempts)) continue;
+                var payload = new
+                {
+                    identificadorAsiento = entry.JournalId,
+                    descripcion = entry.Description,
+                    identificadorTipoInventario = entry.InventoryTypeId,
+                    cuentaContable = entry.Account,
+                    tipoMovimiento = entry.Movement,
+                    fechaAsiento = entry.EntryDate.ToString("yyyy-MM-dd"),
+                    montoAsiento = entry.Amount,
+                    estado = "Activo"
+                };
+                entry.Attempts++;
+                try
+                {
+                    using var req = new HttpRequestMessage(HttpMethod.Post, url);
+                    req.Headers.TryAddWithoutValidation("Idempotency-Key", entry.JournalId.ToString());
+                    if (!string.IsNullOrEmpty(configuration["Accounting:BearerToken"]))
+                        req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", configuration["Accounting:BearerToken"]);
+                    req.Content = JsonContent.Create(payload);
+                    using var res = await client.SendAsync(req, ct);
+                    entry.Response = Truncate(await res.Content.ReadAsStringAsync(ct));
+                    var code = (int)res.StatusCode;
+                    if (res.IsSuccessStatusCode) { entry.Status = AccountingStatus.Sent; delivered++; }
+                    else if (code is >= 400 and < 500 and not 408 and not 429) entry.Status = AccountingStatus.Rejected;
+                    else entry.Status = AccountingStatus.Error;
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+                catch (Exception ex)
+                {
+                    // Timeout del HttpClient, red caída, URL inválida, etc.
+                    entry.Status = AccountingStatus.Error;
+                    entry.Response = Truncate(ex.Message);
+                }
+                await db.SaveChangesAsync(ct);
             }
-            catch (HttpRequestException ex) { entry.Status = "Error"; entry.Response = ex.Message[..Math.Min(ex.Message.Length, 1900)]; }
-            catch (TaskCanceledException ex) when (!ct.IsCancellationRequested) { entry.Status = "Error"; entry.Response = ex.Message[..Math.Min(ex.Message.Length, 1900)]; }
-            await db.SaveChangesAsync(ct);
         }
+        finally { Gate.Release(); }
         return delivered;
     }
 

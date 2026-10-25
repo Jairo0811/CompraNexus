@@ -34,3 +34,20 @@ Existe un índice único `(PurchaseOrderId, Movement)` para impedir más de un D
 lleguen solicitudes concurrentes. En bases ya creadas con `EnsureCreated` se aplica de forma aditiva al
 arrancar en Development (`SchemaPatches`) o manualmente con `scripts/sql/001-accounting-unique-index.sql`.
 Sigue siendo un contrato **provisional**: no hay integración externa verificada.
+
+## Estados de asiento y política de reintentos
+
+| Estado | Significado | ¿Se reintenta? |
+|---|---|---|
+| Pendiente | Creado, aún sin enviar o sin servicio configurado | Sí |
+| Enviado | El servicio respondió 2xx | No |
+| Error | 5xx, 408, 429, timeout o error de red | Sí, hasta `Accounting:MaxAttempts` (5 por defecto) |
+| Rechazado | El servicio respondió otro 4xx | No: requiere revisión manual |
+
+Cada reintento reutiliza la misma `Idempotency-Key` (el `JournalId` del asiento). Esa garantía solo es real si el
+servicio contable de destino la respeta; **no está verificado**. Los envíos se serializan dentro del proceso.
+
+### Servicio simulado vs. real
+Las pruebas usan `FakeAccountingHandler` (un `HttpMessageHandler` en el proyecto de pruebas): simula 200, 4xx, 5xx y
+timeout sin red. Demuestra el comportamiento de CompraNexus ante esas respuestas, **no** la compatibilidad con la
+Contabilidad de otros grupos.

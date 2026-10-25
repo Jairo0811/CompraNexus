@@ -9,7 +9,7 @@ namespace CompraNexus.Api.Controllers;
 
 [ApiController]
 [Route("api/purchase-orders")]
-public sealed class PurchaseOrdersController(CompraNexusDbContext db, AccountingGateway accounting) : ControllerBase
+public sealed class PurchaseOrdersController(CompraNexusDbContext db, IAccountingGateway accounting) : ControllerBase
 {
     private IQueryable<PurchaseOrder> Orders => db.PurchaseOrders.AsNoTracking()
         .Include(x => x.Department).Include(x => x.Employee).Include(x => x.Supplier)

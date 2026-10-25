@@ -17,7 +17,7 @@ builder.Services.AddDbContext<CompraNexusDbContext>(options =>
         errorNumbersToAdd: null)));
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddHttpClient<AccountingGateway>(client => client.Timeout = TimeSpan.FromSeconds(12));
+builder.Services.AddHttpClient<IAccountingGateway, AccountingGateway>(client => client.Timeout = TimeSpan.FromSeconds(12));
 builder.Services.AddCors(options => options.AddPolicy("frontend", p => p
     .WithOrigins(builder.Configuration["Frontend:Origin"] ?? "http://localhost:5173")
     .AllowAnyHeader().AllowAnyMethod()));

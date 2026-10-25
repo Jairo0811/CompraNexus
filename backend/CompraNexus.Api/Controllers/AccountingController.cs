@@ -1,4 +1,5 @@
 using CompraNexus.Api.Data;
+using CompraNexus.Api.Domain;
 using CompraNexus.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace CompraNexus.Api.Controllers;
 
 [ApiController]
 [Route("api/accounting")]
-public sealed class AccountingController(CompraNexusDbContext db, AccountingGateway gateway) : ControllerBase
+public sealed class AccountingController(CompraNexusDbContext db, IAccountingGateway gateway) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> List() => Ok(new
@@ -25,9 +26,12 @@ public sealed class AccountingController(CompraNexusDbContext db, AccountingGate
     public async Task<IActionResult> Retry(CancellationToken ct)
     {
         if (!gateway.Configured) return BadRequest(new { message = "Configure Accounting:ServiceUrl primero." });
-        var entries = await db.AccountingEntries.Where(a => a.Status != "Enviado").ToListAsync(ct);
+        // Solo Pendiente/Error; los Rechazado (4xx) requieren revisión manual y no se reenvían.
+        var entries = await db.AccountingEntries
+            .Where(a => a.Status == AccountingStatus.Pending || a.Status == AccountingStatus.Error).ToListAsync(ct);
         var sent = await gateway.TransmitAsync(entries, ct);
-        return Ok(new { sent, remaining = entries.Count - sent });
+        var rejected = await db.AccountingEntries.CountAsync(a => a.Status == AccountingStatus.Rejected, ct);
+        return Ok(new { sent, remaining = entries.Count(a => a.Status != AccountingStatus.Sent), rejected });
     }
 }
 
