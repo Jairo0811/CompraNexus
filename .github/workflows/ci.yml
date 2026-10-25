@@ -39,3 +39,12 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser smoke tests
         run: npm run test:e2e
+
+  powershell:
+    name: Windows PowerShell / local config smoke
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate password repair script
+        shell: pwsh
+        run: ./scripts/Test-StartupConfig.ps1

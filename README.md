@@ -316,10 +316,7 @@ Requiere Docker Desktop.
 ```powershell
 git clone https://github.com/Jairo0811/CompraNexus.git
 cd CompraNexus
-Copy-Item .env.example .env
-# Edite .env y configure una contraseña fuerte en MSSQL_SA_PASSWORD
-docker compose up --build -d
-docker compose ps
+.\scripts\Start-CompraNexus.ps1
 ```
 
 | Servicio | Dirección |
@@ -327,17 +324,17 @@ docker compose ps
 | Frontend React | http://localhost:8088 |
 | API ASP.NET Core | http://localhost:5098 |
 | Health | http://localhost:5098/health |
-| SQL Server | localhost,1433 |
+| SQL Server | localhost,14330 |
 | Base de datos | CompraNexus |
 
-> No use `docker compose down -v` salvo que desee eliminar deliberadamente el volumen de SQL Server.
+> El arranque recomendado genera una contraseña fuerte únicamente si la de `.env` es inválida y conserva el volumen. No ejecute `docker compose down -v`: eliminaría la base de datos. Si el volumen ya estaba inicializado, la contraseña almacenada no cambia al modificar `.env`; consulte [la recuperación segura](docs/DEPLOYMENT.md).
 
 ### Opción 2 — Desarrollo separado
 
 Con SQL Server accesible:
 
 ```powershell
-$env:ConnectionStrings__SqlServer = 'Server=localhost,1433;Database=CompraNexus;User Id=sa;Password=SU_CLAVE;Encrypt=True;TrustServerCertificate=True'
+$env:ConnectionStrings__SqlServer = 'Server=localhost,14330;Database=CompraNexus;User Id=sa;Password=SU_CLAVE;Encrypt=True;TrustServerCertificate=True'
 
 dotnet run --project backend/CompraNexus.Api --launch-profile http
 ```

@@ -1,15 +1,26 @@
 name: compranexus
+
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
-      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Defina MSSQL_SA_PASSWORD en .env}"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Ejecute .\\scripts\\Start-CompraNexus.ps1 o defina MSSQL_SA_PASSWORD en .env}"
     ports:
-      - "127.0.0.1:1433:1433"
+      - "127.0.0.1:14330:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+    healthcheck:
+      # Comprueba el puerto interno; la API comprueba ademas la autenticacion
+      # y la disponibilidad de la BD mediante su endpoint /health.
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/1433'"]
+      interval: 5s
+      timeout: 3s
+      start_period: 40s
+      retries: 30
+
   api:
     build:
       context: .
@@ -20,9 +31,12 @@ services:
       Accounting__ServiceUrl: "${ACCOUNTING_SERVICE_URL:-}"
       Accounting__BearerToken: "${ACCOUNTING_BEARER_TOKEN:-}"
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy
     ports:
       - "127.0.0.1:5098:8080"
+    restart: on-failure
+
   frontend:
     build:
       context: ./frontend
@@ -30,5 +44,7 @@ services:
       - api
     ports:
       - "127.0.0.1:8088:80"
+    restart: unless-stopped
+
 volumes:
   sqlserver_data:
