@@ -220,4 +220,44 @@ public class SqlServerIntegrationTests : SqlServerTestBase
         Assert.Equal(1, await verify.Departments.CountAsync());
         Assert.Equal(1, await verify.Employees.CountAsync());
     }
+    [SqlServerFact]
+    public async Task Authentication_UserTableHasUniqueNormalizedEmailIndex()
+    {
+        await using var db = NewDb();
+        var exists = await db.Database.SqlQueryRaw<int>(
+            "SELECT COUNT(*) AS [Value] FROM sys.tables WHERE name = N'AppUsers'").SingleAsync();
+        var unique = await db.Database.SqlQueryRaw<int>(
+            "SELECT COUNT(*) AS [Value] FROM sys.indexes WHERE name = N'IX_AppUsers_NormalizedEmail' " +
+            "AND is_unique = 1 AND object_id = OBJECT_ID(N'dbo.AppUsers')").SingleAsync();
+        Assert.Equal(1, exists);
+        Assert.Equal(1, unique);
+    }
+
+    [SqlServerFact]
+    public async Task Authentication_BootstrapCreatesOneHashedAdministrator_AndKeepsExistingData()
+    {
+        await using var db = NewDb();
+        await SeedAsync(db);
+        var email = "test-" + Guid.NewGuid().ToString("N") + "@example.test";
+        var password = "Test-" + Guid.NewGuid().ToString("N") + "!";
+        var settings = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?> {
+                ["Auth:BootstrapEmail"] = email,
+                ["Auth:BootstrapPassword"] = password
+            }).Build();
+        await AdminBootstrap.EnsureInitialAdminAsync(db, settings, NullLogger.Instance);
+        await AdminBootstrap.EnsureInitialAdminAsync(db, settings, NullLogger.Instance);
+
+        await using var verify = NewDb();
+        var user = await verify.AppUsers.SingleAsync();
+        Assert.Equal(email, user.Email);
+        Assert.Equal("Administrador", user.Role);
+        Assert.NotEqual(password, user.PasswordHash);
+        var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<AppUser>();
+        Assert.NotEqual(Microsoft.AspNetCore.Identity.PasswordVerificationResult.Failed,
+            hasher.VerifyHashedPassword(user, user.PasswordHash, password));
+        Assert.Equal(1, await verify.Departments.CountAsync());
+        Assert.Equal(1, await verify.AppUsers.CountAsync());
+    }
+
 }

@@ -1,4 +1,5 @@
 using CompraNexus.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 using CompraNexus.Api.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ public abstract class CatalogController<T>(CompraNexusDbContext db) : Controller
         return item is null ? NotFound() : Ok(item);
     }
 
+    [Authorize(Roles = "Administrador,Compras")]
     [HttpPost]
     public async Task<ActionResult<T>> Create([FromBody] T model)
     {
@@ -29,6 +31,7 @@ public abstract class CatalogController<T>(CompraNexusDbContext db) : Controller
         return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
     }
 
+    [Authorize(Roles = "Administrador,Compras")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] T model)
     {
@@ -42,6 +45,7 @@ public abstract class CatalogController<T>(CompraNexusDbContext db) : Controller
         return NoContent();
     }
 
+    [Authorize(Roles = "Administrador,Compras")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -5,6 +5,7 @@ namespace CompraNexus.Api.Data;
 
 public sealed class CompraNexusDbContext(DbContextOptions<CompraNexusDbContext> options) : DbContext(options)
 {
+    public DbSet<AppUser> AppUsers => Set<AppUser>();
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<UnitMeasure> UnitMeasures => Set<UnitMeasure>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -16,6 +17,12 @@ public sealed class CompraNexusDbContext(DbContextOptions<CompraNexusDbContext> 
 
     protected override void OnModelCreating(ModelBuilder model)
     {
+        model.Entity<AppUser>().ToTable("AppUsers").HasIndex(x => x.NormalizedEmail).IsUnique();
+        model.Entity<AppUser>().Property(x => x.Email).HasMaxLength(180).IsRequired();
+        model.Entity<AppUser>().Property(x => x.NormalizedEmail).HasMaxLength(180).IsRequired();
+        model.Entity<AppUser>().Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
+        model.Entity<AppUser>().Property(x => x.Role).HasMaxLength(40).IsRequired();
+        model.Entity<AppUser>().Property(x => x.SecurityStamp).HasMaxLength(64).IsRequired();
         model.Entity<Department>().HasIndex(x => x.Name).IsUnique();
         model.Entity<UnitMeasure>().HasIndex(x => x.Description).IsUnique();
         model.Entity<Supplier>().HasIndex(x => x.TaxId).IsUnique();

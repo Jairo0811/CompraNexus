@@ -1,4 +1,5 @@
 using CompraNexus.Api.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using CompraNexus.Api.Data;
 using CompraNexus.Api.Domain;
 using CompraNexus.Api.Services;
@@ -43,6 +44,7 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, IAccountin
         return order is null ? NotFound() : Ok(ToView(order));
     }
 
+    [Authorize(Roles = "Administrador,Compras")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] PurchaseOrderInput input)
     {
@@ -61,6 +63,7 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, IAccountin
         return CreatedAtAction(nameof(Get), new { id = order.Id }, new { id = order.Id });
     }
 
+    [Authorize(Roles = "Administrador,Compras")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] PurchaseOrderInput input)
     {
@@ -85,6 +88,7 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, IAccountin
         return NoContent();
     }
 
+    [Authorize(Roles = "Administrador,Compras")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -98,6 +102,7 @@ public sealed class PurchaseOrdersController(CompraNexusDbContext db, IAccountin
         return NoContent();
     }
 
+    [Authorize(Roles = "Administrador,Contabilidad")]
     [HttpPost("{id:int}/accounting")]
     public async Task<IActionResult> GenerateAccounting(int id, CancellationToken ct)
     {

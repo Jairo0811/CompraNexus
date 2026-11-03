@@ -12,7 +12,7 @@ const emptyOrder = (): OrderInput => ({
   lines: [{ articleId: 0, quantity: 1, unitCost: 0 }],
 });
 const blankLists: Lists = { departments: [], employees: [], suppliers: [], articles: [] };
-export function PurchaseOrders() {
+export function PurchaseOrders({ canPurchase = true, canAccount = true }: { canPurchase?: boolean; canAccount?: boolean }) {
   const [rows, setRows] = useState<Order[]>([]);
   const [lists, setLists] = useState<Lists>(blankLists);
   const [editing, setEditing] = useState<number | null>(null);
@@ -77,13 +77,13 @@ export function PurchaseOrders() {
     {notice && <div className="alert success" role="status">{notice}</div>}
     {error && <div className="alert error" role="alert">{error}</div>}
     <section className="panel">
-      <div className="panel-title"><div><h2>Órdenes registradas</h2><p>Gestión de encabezados y detalles de compra</p></div><button className="button" onClick={openNew}><Plus size={17}/> Nueva orden</button></div>
+      <div className="panel-title"><div><h2>Órdenes registradas</h2><p>Gestión de encabezados y detalles de compra</p></div>{canPurchase && <button className="button" onClick={openNew}><Plus size={17}/> Nueva orden</button>}</div>
       <div className="table-scroll"><table><thead><tr><th>Orden</th><th>Fecha</th><th>Departamento</th><th>Empleado</th><th>Proveedor</th><th>Estado</th><th className="align-right">Total</th><th className="align-right">Acciones</th></tr></thead>
         <tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.number}</strong><small className="subcell">{row.lines.length} artículos</small></td><td>{row.orderDate}</td><td>{row.department}</td><td>{row.employee}</td><td>{row.supplier}</td><td><span className={'pill ' + (row.status === 'Confirmada' ? 'ok' : '')}>{row.status}</span></td><td className="align-right"><strong>{moneyRD(row.total)}</strong></td>
           <td><div className="table-actions">
-            <button className="icon-button" aria-label={'Editar ' + row.number} disabled={!isEditable(row.status)} title={isEditable(row.status) ? undefined : 'Las órdenes anuladas no pueden modificarse'} onClick={() => openEdit(row)}><Pencil size={16}/></button>
-            {row.status === 'Confirmada' && <button className="icon-button" aria-label={'Contabilizar ' + row.number} onClick={() => void accounting(row)}><Link2 size={16}/></button>}
-            {row.status === 'Borrador' && <button className="icon-button red" aria-label={'Eliminar ' + row.number} onClick={() => void remove(row)}><Trash2 size={16}/></button>}
+            {canPurchase && <button className="icon-button" aria-label={'Editar ' + row.number} disabled={!isEditable(row.status)} title={isEditable(row.status) ? undefined : 'Las órdenes anuladas no pueden modificarse'} onClick={() => openEdit(row)}><Pencil size={16}/></button>}
+            {canAccount && row.status === 'Confirmada' && <button className="icon-button" aria-label={'Contabilizar ' + row.number} onClick={() => void accounting(row)}><Link2 size={16}/></button>}
+            {canPurchase && row.status === 'Borrador' && <button className="icon-button red" aria-label={'Eliminar ' + row.number} onClick={() => void remove(row)}><Trash2 size={16}/></button>}
           </div></td></tr>)}
         {loading && <tr><td colSpan={8} className="loading">Cargando órdenes...</td></tr>}
         {!loading && rows.length === 0 && <tr><td colSpan={8} className="empty"><ClipboardList size={32}/><p>No hay órdenes registradas.</p></td></tr>}

@@ -30,6 +30,11 @@ services:
       ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=CompraNexus;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Defina MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
       Accounting__ServiceUrl: "${ACCOUNTING_SERVICE_URL:-}"
       Accounting__BearerToken: "${ACCOUNTING_BEARER_TOKEN:-}"
+      Auth__BootstrapEmail: "${COMPRANEXUS_ADMIN_EMAIL:-}"
+      Auth__BootstrapPassword: "${COMPRANEXUS_ADMIN_PASSWORD:-}"
+      Auth__KeysPath: /app/auth-keys
+    volumes:
+      - auth_keys:/app/auth-keys
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -48,3 +53,4 @@ services:
 
 volumes:
   sqlserver_data:
+  auth_keys:

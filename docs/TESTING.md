@@ -24,3 +24,6 @@ Si una ejecución se interrumpe, puede quedar alguna base temporal:
 `SELECT name FROM sys.databases WHERE name LIKE 'CompraNexus_Test_%';` (elimínelas manualmente; nunca `CompraNexus`).
 
 En GitHub Actions el job `dotnet` levanta un SQL Server efímero con una contraseña aleatoria generada en el propio job.
+
+## Autenticación
+Las nuevas pruebas SQL verifican tabla, índice, hash y bootstrap idempotente de usuarios. El CI ejecuta además un smoke HTTP real de login, CSRF, cookie y logout con un servidor y SQL efímeros. Ver `docs/AUTHENTICATION.md`.

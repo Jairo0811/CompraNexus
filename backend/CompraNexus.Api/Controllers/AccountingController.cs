@@ -1,4 +1,5 @@
 using CompraNexus.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 using CompraNexus.Api.Domain;
 using CompraNexus.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,7 @@ public sealed class AccountingController(CompraNexusDbContext db, IAccountingGat
             }).ToListAsync()
     });
 
+    [Authorize(Roles = "Administrador,Contabilidad")]
     [HttpPost("retry")]
     public async Task<IActionResult> Retry(CancellationToken ct)
     {
