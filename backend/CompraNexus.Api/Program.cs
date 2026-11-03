@@ -94,6 +94,13 @@ if (!string.IsNullOrWhiteSpace(keysPath))
 }
 
 var app = builder.Build();
+// Mantenimiento exclusivo de consola: no abre HTTP ni ejecuta el seeding de desarrollo.
+if (args.Length == 1 && string.Equals(args[0], "reset-admin", StringComparison.OrdinalIgnoreCase))
+{
+    Environment.ExitCode = await AdminRecoveryConsole.RunAsync(
+        app.Services, app.Configuration, app.Environment);
+    return;
+}
 app.UseCors("frontend");
 app.UseAuthentication();
 app.UseAuthorization();

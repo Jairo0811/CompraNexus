@@ -327,7 +327,7 @@ cd CompraNexus
 | SQL Server | localhost,14330 |
 | Base de datos | CompraNexus |
 
-> El arranque recomendado genera una contraseña fuerte únicamente si la de `.env` es inválida y conserva el volumen. No ejecute `docker compose down -v`: eliminaría la base de datos. Si el volumen ya estaba inicializado, la contraseña almacenada no cambia al modificar `.env`; consulte [la recuperación segura](docs/DEPLOYMENT.md).
+> El arranque recomendado genera una contraseña fuerte únicamente si la de `.env` es inválida y conserva el volumen. No ejecute `docker compose down -v`: eliminaría la base de datos. Si el volumen ya estaba inicializado, la contraseña almacenada no cambia al modificar `.env`; consulte [la recuperación segura de SQL Server](docs/DEPLOYMENT.md). Para restablecer la contraseña del administrador de la aplicación, use [la recuperación local del administrador](docs/ADMIN-RECOVERY.md).
 
 ### Opción 2 — Desarrollo separado
 
