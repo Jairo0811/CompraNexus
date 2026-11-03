@@ -73,10 +73,11 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SecurePolicy = builder.Environment.IsProduction()
         ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
 });
+builder.Services.AddScoped<AuthAntiforgeryFilter>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new AuthorizeFilter());
-    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    options.Filters.AddService<AuthAntiforgeryFilter>();
 });
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient<IAccountingGateway, AccountingGateway>(client => client.Timeout = TimeSpan.FromSeconds(12));
