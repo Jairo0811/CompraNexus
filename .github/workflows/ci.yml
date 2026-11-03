@@ -55,7 +55,11 @@ jobs:
             actual="$2"
             expected="$3"
             echo "$label: HTTP $actual (esperado $expected)"
-            test "$actual" = "$expected"
+            if [ "$actual" != "$expected" ]; then
+              echo 'Diagnóstico de la API (secretos enmascarados):'
+              grep -E 'fail:|Exception:|InvalidOperationException|System\\.|error:' "$RUNNER_TEMP/auth-api.log" | sed -E 's/(Password=)[^;[:space:]]+/\\1[REDACTED]/g' | tail -35 || true
+              exit 1
+            fi
           }
           status=$(curl -sS -o /dev/null -w '%{http_code}' "$base/dashboard")
           check_status "Dashboard anónimo" "$status" "401"
