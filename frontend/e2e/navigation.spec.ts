@@ -4,6 +4,10 @@ test('El sistema solicita credenciales cuando no hay sesión', async ({ page }) 
   await page.route('**/api/auth/me', route => route.fulfill({ status: 401, json: { message: 'No autenticado' } }));
   await page.goto('/orders');
   await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+  const officialLogo = page.getByRole('img', { name: 'CompraNexus — Sistema de compras e integración contable' });
+  await expect(officialLogo).toBeVisible();
+  await expect(officialLogo).toHaveJSProperty('complete', true);
+  expect(await officialLogo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   await expect(page).toHaveURL(/\/login$/);
 });
 
@@ -27,6 +31,10 @@ test('El login permite acceder al dashboard y a departamentos (API simulada)', a
   await page.getByLabel('Contraseña', { exact: true }).fill('ClaveSoloParaMock123!');
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+  const officialIcon = page.locator('.brand-emblem img');
+  await expect(officialIcon).toBeVisible();
+  await expect(officialIcon).toHaveJSProperty('complete', true);
+  expect(await officialIcon.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   await expect(page.getByText('Compras conectadas.')).toBeVisible();
   await page.getByRole('link', { name: 'Departamentos' }).first().click();
   await expect(page.getByRole('heading', { name: 'Departamentos', exact: true })).toBeVisible();

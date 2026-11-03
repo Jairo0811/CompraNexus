@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { Eye, EyeOff, LockKeyhole, LogIn, Network, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { api, resetCsrfToken, errorMessage, type SessionUser } from '../api';
 
@@ -42,8 +42,9 @@ export function Login({ onLogin, startupError }: {
     <div className="login-frame">
       <section className="login-promo" aria-label="CompraNexus">
         <div className="login-brand">
-          <span className="login-emblem"><Network size={27}/></span>
-          <strong>Compra<span>Nexus</span></strong>
+          <img className="login-brand-logo" src="/compranexus-logo.png"
+            alt="CompraNexus — Sistema de compras e integración contable"
+            width="230" height="170" fetchPriority="high"/>
         </div>
         <div className="login-promo-copy">
           <span className="login-kicker">PLATAFORMA DE COMPRAS</span>

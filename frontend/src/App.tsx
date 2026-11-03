@@ -2,7 +2,7 @@ import { NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'reac
 import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Boxes, Ruler, Truck, ClipboardList, UsersRound,
-  ChartColumnIncreasing, Link2, Menu, X, Network, LogOut, UserCircle,
+  ChartColumnIncreasing, Link2, Menu, X, LogOut, UserCircle,
 } from 'lucide-react';
 import { api, getSession, resetCsrfToken, SESSION_EXPIRED, errorMessage, type SessionUser } from './api';
 import { catalogs } from './catalogs';
@@ -81,7 +81,7 @@ export default function App() {
   return <div className="app">
     <aside className={'sidebar ' + (mobileOpen ? 'open' : '')} aria-label="Navegación principal">
       <NavLink to="/" className="brand" onClick={() => setMobileOpen(false)}>
-        <div className="brand-emblem"><Network size={25}/></div>
+        <span className="brand-emblem"><img src="/compranexus-isotipo.png" alt="" width="46" height="46"/></span>
         <div><strong>Compra<span>Nexus</span></strong><small>COMPRAS E INTEGRACIÓN</small></div>
       </NavLink>
       <div className="side-label">GENERAL</div>
