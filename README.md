@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/public/favicon.svg" alt="CompraNexus" width="110" />
+<img src="frontend/public/logo.png" alt="CompraNexus" width="110" />
 
 # CompraNexus
 
