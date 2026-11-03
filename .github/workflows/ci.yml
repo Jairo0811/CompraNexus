@@ -50,22 +50,30 @@ jobs:
           curl -fsS http://127.0.0.1:5099/health > /dev/null
           base="http://127.0.0.1:5099/api"
           jar="$RUNNER_TEMP/auth-cookies.txt"
+          check_status() {
+            label="$1"
+            actual="$2"
+            expected="$3"
+            echo "$label: HTTP $actual (esperado $expected)"
+            test "$actual" = "$expected"
+          }
           status=$(curl -sS -o /dev/null -w '%{http_code}' "$base/dashboard")
-          test "$status" = "401"
+          check_status "Dashboard anónimo" "$status" "401"
           token=$(curl -fsS -c "$jar" -b "$jar" "$base/auth/csrf" | jq -r '.token')
           test -n "$token"
+          echo 'Token antiforgery inicial obtenido.'
           payload=$(jq -nc --arg email "$Auth__BootstrapEmail" --arg password "$Auth__BootstrapPassword" '{email:$email,password:$password}')
           status=$(curl -sS -o /dev/null -w '%{http_code}' -c "$jar" -b "$jar" -H 'Content-Type: application/json' -d "$payload" "$base/auth/login")
-          test "$status" = "400"
+          check_status "Login sin CSRF" "$status" "400"
           status=$(curl -sS -o /dev/null -w '%{http_code}' -c "$jar" -b "$jar" -H 'Content-Type: application/json' -H "X-CSRF-TOKEN: $token" -d "$payload" "$base/auth/login")
-          test "$status" = "200"
+          check_status "Login válido" "$status" "200"
           status=$(curl -sS -o /dev/null -w '%{http_code}' -b "$jar" "$base/dashboard")
-          test "$status" = "200"
+          check_status "Dashboard autenticado" "$status" "200"
           token=$(curl -fsS -c "$jar" -b "$jar" "$base/auth/csrf" | jq -r '.token')
           status=$(curl -sS -o /dev/null -w '%{http_code}' -c "$jar" -b "$jar" -X POST -H "X-CSRF-TOKEN: $token" "$base/auth/logout")
-          test "$status" = "204"
+          check_status "Logout" "$status" "204"
           status=$(curl -sS -o /dev/null -w '%{http_code}' -b "$jar" "$base/dashboard")
-          test "$status" = "401"
+          check_status "Dashboard tras logout" "$status" "401"
   frontend:
     name: React / Vitest / Playwright
     runs-on: ubuntu-latest
