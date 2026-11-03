@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Eye, EyeOff, LockKeyhole, LogIn, Network, ShieldCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { api, errorMessage, type SessionUser } from '../api';
+import { api, resetCsrfToken, errorMessage, type SessionUser } from '../api';
 
 export function Login({ onLogin, startupError }: {
   onLogin: (user: SessionUser) => void;
@@ -28,6 +28,7 @@ export function Login({ onLogin, startupError }: {
         body: JSON.stringify({ email: email.trim(), password }),
       });
       setPassword('');
+      resetCsrfToken(); // Token anterior ligado a identidad anónima; regenerar tras autenticar.
       onLogin(session);
       navigate(destination, { replace: true });
     } catch (err) {

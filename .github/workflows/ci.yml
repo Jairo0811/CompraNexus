@@ -30,6 +30,42 @@ jobs:
           exit 1
       - name: xUnit tests
         run: dotnet test backend/CompraNexus.slnx -c Release --no-build --verbosity normal
+      - name: Auth HTTP smoke with isolated SQL Server
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ASPNETCORE_ENVIRONMENT=Development
+          export ASPNETCORE_URLS=http://127.0.0.1:5099
+          export ConnectionStrings__SqlServer="${COMPRANEXUS_TEST_SQL};Database=CompraNexus_CI_Auth"
+          export Auth__BootstrapEmail="ci-auth@example.test"
+          export Auth__BootstrapPassword="Ci-$(openssl rand -hex 18)-Aa1!"
+          export Auth__KeysPath="$RUNNER_TEMP/auth-keys"
+          dotnet run --project backend/CompraNexus.Api/CompraNexus.Api.csproj -c Release --no-build --no-launch-profile > "$RUNNER_TEMP/auth-api.log" 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:5099/health > /dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:5099/health > /dev/null
+          base="http://127.0.0.1:5099/api"
+          jar="$RUNNER_TEMP/auth-cookies.txt"
+          status=$(curl -sS -o /dev/null -w '%{http_code}' "$base/dashboard")
+          test "$status" = "401"
+          token=$(curl -fsS -c "$jar" -b "$jar" "$base/auth/csrf" | jq -r '.token')
+          test -n "$token"
+          payload=$(jq -nc --arg email "$Auth__BootstrapEmail" --arg password "$Auth__BootstrapPassword" '{email:$email,password:$password}')
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -c "$jar" -b "$jar" -H 'Content-Type: application/json' -d "$payload" "$base/auth/login")
+          test "$status" = "400"
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -c "$jar" -b "$jar" -H 'Content-Type: application/json' -H "X-CSRF-TOKEN: $token" -d "$payload" "$base/auth/login")
+          test "$status" = "200"
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -b "$jar" "$base/dashboard")
+          test "$status" = "200"
+          token=$(curl -fsS -c "$jar" -b "$jar" "$base/auth/csrf" | jq -r '.token')
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -c "$jar" -b "$jar" -X POST -H "X-CSRF-TOKEN: $token" "$base/auth/logout")
+          test "$status" = "204"
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -b "$jar" "$base/dashboard")
+          test "$status" = "401"
   frontend:
     name: React / Vitest / Playwright
     runs-on: ubuntu-latest

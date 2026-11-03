@@ -2,7 +2,9 @@ using System.Security.Claims;
 using CompraNexus.Api.Data;
 using CompraNexus.Api.Domain;
 using CompraNexus.Api.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -118,7 +120,7 @@ if (app.Environment.IsDevelopment())
             await AdminBootstrap.EnsureInitialAdminAsync(db, app.Configuration, app.Logger);
             break;
         }
-        catch (Exception ex) when (i < 39 && (ex is Microsoft.Data.SqlClient.SqlException || ex is InvalidOperationException))
+        catch (Exception ex) when (i < 39 && (ex is Microsoft.Data.SqlClient.SqlException))
         {
             app.Logger.LogWarning("SQL Server aun no esta disponible (intento {Attempt}/40).", i + 1);
             await Task.Delay(TimeSpan.FromSeconds(3));

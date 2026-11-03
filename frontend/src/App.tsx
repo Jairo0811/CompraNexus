@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, Boxes, Ruler, Truck, ClipboardList, UsersRound,
   ChartColumnIncreasing, Link2, Menu, X, Network, LogOut, UserCircle,
 } from 'lucide-react';
-import { api, getSession, SESSION_EXPIRED, errorMessage, type SessionUser } from './api';
+import { api, getSession, resetCsrfToken, SESSION_EXPIRED, errorMessage, type SessionUser } from './api';
 import { catalogs } from './catalogs';
 import { CatalogPage } from './pages/CatalogPage';
 import { Dashboard } from './pages/Dashboard';
@@ -41,7 +41,7 @@ export default function App() {
     return () => { active = false; };
   }, []);
   useEffect(() => {
-    const expired = () => { setSession(null); navigate('/login', { replace: true }); };
+    const expired = () => { resetCsrfToken(); setSession(null); navigate('/login', { replace: true }); };
     window.addEventListener(SESSION_EXPIRED, expired);
     return () => window.removeEventListener(SESSION_EXPIRED, expired);
   }, [navigate]);
@@ -51,6 +51,7 @@ export default function App() {
     setSigningOut(true);
     try {
       await api('/auth/logout', { method: 'POST' });
+      resetCsrfToken();
       setSession(null);
       navigate('/login', { replace: true });
     } catch (e) {
@@ -110,7 +111,7 @@ export default function App() {
       </header>
       <Routes>
         <Route path="/" element={<Dashboard/>}/>
-        <Route path="/orders" element={<PurchaseOrders/>}/>
+        <Route path="/orders" element={<PurchaseOrders canPurchase={canPurchase} canAccount={canAccount}/>}/>
         <Route path="/reports" element={<Reports/>}/>
         <Route path="/accounting" element={canAccount ? <Accounting/> : <Navigate to="/" replace/>}/>
         <Route path="/catalogs/:kind" element={canPurchase
