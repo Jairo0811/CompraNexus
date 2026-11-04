@@ -19,6 +19,11 @@ El valor se almacena normalizado, solo dígitos, en `Suppliers.TaxId`; no se añ
 
 ## Limitaciones y privacidad
 
+La DGII informó en agosto de 2025 que la antigua API pública de consulta RNC de
+`api.digital.gob.do/v1/contributors/{rnc}/info/basic` **no se encontraba operativa**;
+por eso CompraNexus no la llama ni la asume disponible.
+Fuente: [respuesta de DGII a consulta sobre el API](https://ayuda.dgii.gov.do/conversations/discusiones/api-consulta-rnccedula/68a4e3057461a7771d2f7399).
+
 **Validación matemática NO es validación de identidad o registro real**:
 una cédula que pasa Luhn no significa que pertenezca a alguien, y un RNC cuyo checksum
 es correcto no significa que esté inscrito, habilitado o al día en DGII.
