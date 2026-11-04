@@ -24,6 +24,12 @@ public abstract class CatalogController<T>(CompraNexusDbContext db) : Controller
     public async Task<ActionResult<T>> Create([FromBody] T model)
     {
         model.Id = 0;
+        if (model is Supplier supplier)
+        {
+            var taxId = DominicanTaxId.Check(supplier.TaxId);
+            if (!taxId.IsValid) return BadRequest(new { message = taxId.Message });
+            supplier.TaxId = taxId.Normalized;
+        }
         if (!await ForeignKeysValid(model)) return BadRequest(new { message = "Referencia de catálogo inválida." });
         db.Set<T>().Add(model);
         try { await db.SaveChangesAsync(); }
@@ -37,6 +43,12 @@ public abstract class CatalogController<T>(CompraNexusDbContext db) : Controller
     {
         var existing = await db.Set<T>().FindAsync(id);
         if (existing is null) return NotFound();
+        if (model is Supplier supplier)
+        {
+            var taxId = DominicanTaxId.Check(supplier.TaxId);
+            if (!taxId.IsValid) return BadRequest(new { message = taxId.Message });
+            supplier.TaxId = taxId.Normalized;
+        }
         if (!await ForeignKeysValid(model)) return BadRequest(new { message = "Referencia de catálogo inválida." });
         model.Id = id;
         db.Entry(existing).CurrentValues.SetValues(model);
