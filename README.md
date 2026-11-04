@@ -368,6 +368,23 @@ API: **http://localhost:5098**
 
 ---
 
+## 🇩🇴 Validación de cédula y RNC (proveedores)
+
+La creación y edición de proveedores valida el **dígito de control** de RNC (9 dígitos,
+módulo 11) y cédula (11 dígitos, Luhn), normalizando los identificadores sin separadores.
+El formulario incluye un botón **Validar** y el backend rechaza identificadores
+matemáticamente incorrectos aun cuando la solicitud no provenga de React.
+
+**Importante:** comprobar el dígito de control **no equivale a verificar identidad,
+inscripción o vigencia ante DGII/JCE**. No se realizan consultas externas automáticas.
+Las cédulas históricas excepcionales pueden requerir comprobación oficial.
+
+Referencias y limitaciones: [validación de cédula/RNC](docs/VALIDACION-CEDULA-RNC.md).
+Basado en enfoques de [OGTIC Cuenta Única](https://github.com/ogticrd/cuenta-unica-registry)
+y [OGTIC DGII Services API](https://github.com/ogticrd/dgii-services-api).
+
+---
+
 ## 🧪 Pruebas y CI
 
 ### Backend
