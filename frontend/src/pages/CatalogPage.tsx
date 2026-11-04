@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, Pencil, Search, Trash2 } from 'lucide-react';
 import { api, errorMessage } from '../api';
@@ -6,6 +6,7 @@ import { draft, type CatalogConfig } from '../catalogs';
 import { Modal } from '../components/Modal';
 import type { CatalogRecord, Lookup } from '../types';
 
+type TaxIdCheck = { isValid: boolean; normalized: string; type: 'cedula' | 'rnc' | null; message: string };
 type FormValue = string | number;
 type FormState = Record<string, FormValue>;
 const display = (row: CatalogRecord, field: string, lookup: Record<string, Lookup[]>) => {
@@ -26,6 +27,9 @@ export function CatalogPage({ catalogs }: { catalogs: Record<string, CatalogConf
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [taxIdCheck, setTaxIdCheck] = useState<TaxIdCheck | null>(null);
+  const [checkingTaxId, setCheckingTaxId] = useState(false);
+  const taxIdSequence = useRef(0);
   const load = useCallback(async () => {
     if (!config) return;
     try { setRows(await api<CatalogRecord[]>('/' + kind)); setError(''); }
@@ -48,10 +52,28 @@ export function CatalogPage({ catalogs }: { catalogs: Record<string, CatalogConf
   const options = (type: string, current: FormValue | undefined) =>
     (lookups[type] ?? []).filter(x => x.status !== 'Inactivo' || x.id === Number(current));
   const rowLabel = (row: CatalogRecord) => String(row[config.fields[0].key] ?? row.id);
-  const openNew = () => { setEditing(null); setForm(draft(config.fields)); setError(''); setModalError(''); setNotice(''); };
+  const resetTaxIdCheck = () => { taxIdSequence.current++; setTaxIdCheck(null); setCheckingTaxId(false); };
+  const openNew = () => { resetTaxIdCheck(); setEditing(null); setForm(draft(config.fields)); setError(''); setModalError(''); setNotice(''); };
   const openEdit = (row: CatalogRecord) => {
+    resetTaxIdCheck();
     setEditing(row.id); setForm(Object.fromEntries(config.fields.map(f => [f.key, row[f.key] ?? '']))); setError(''); setModalError(''); setNotice('');
   };
+  async function checkTaxId() {
+    if (!form || !String(form.taxId ?? '').trim() || checkingTaxId) return;
+    const sequence = ++taxIdSequence.current;
+    setCheckingTaxId(true); setTaxIdCheck(null);
+    try {
+      const result = await api<TaxIdCheck>('/identifications/validate', {
+        method: 'POST', body: JSON.stringify({ number: String(form.taxId) }),
+      });
+      if (taxIdSequence.current === sequence) setTaxIdCheck(result);
+    } catch (err) {
+      if (taxIdSequence.current === sequence)
+        setTaxIdCheck({ isValid: false, normalized: '', type: null, message: errorMessage(err) });
+    } finally {
+      if (taxIdSequence.current === sequence) setCheckingTaxId(false);
+    }
+  }
   const closeForm = () => { if (!busy) { setForm(null); setModalError(''); } };
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -94,7 +116,23 @@ export function CatalogPage({ catalogs }: { catalogs: Record<string, CatalogConf
     </section>
     {form && <Modal title={(editing ? 'Editar' : 'Nuevo') + ' · ' + config.title} subtitle="Completa los campos de este mantenimiento." error={modalError} onClose={closeForm}>
       <form onSubmit={e => void submit(e)} className="form-grid">
-        {config.fields.map(field => <label className="field" key={field.key}><span>{field.label}{field.required ? ' *' : ''}</span>
+        {config.fields.map(field => field.key === 'taxId' && kind === 'suppliers' ?
+          <div className="field" key={field.key}>
+            <label htmlFor="supplier-tax-id">{field.label} *</label>
+            <div className="tax-id-entry">
+              <input id="supplier-tax-id" required maxLength={20} inputMode="numeric"
+                autoComplete="off" placeholder="RNC (9) o cédula (11)"
+                value={form.taxId ?? ''}
+                onChange={e => { resetTaxIdCheck(); setForm(v => v && ({ ...v, taxId: e.target.value })); }}/>
+              <button type="button" className="button secondary" disabled={busy || checkingTaxId || !String(form.taxId ?? '').trim()}
+                onClick={() => void checkTaxId()}>{checkingTaxId ? 'Validando...' : 'Validar'}</button>
+            </div>
+            {taxIdCheck && <small className={taxIdCheck.isValid ? 'tax-id-feedback valid' : 'tax-id-feedback invalid'} role="status">
+              {taxIdCheck.isValid ? '✓ ' : '✕ '}{taxIdCheck.message}
+            </small>}
+            <small className="tax-id-hint">Verificación matemática. No certifica existencia ni estado en DGII o JCE.</small>
+          </div> :
+          <label className="field" key={field.key}><span>{field.label}{field.required ? ' *' : ''}</span>
           {field.type === 'status' ? <select required value={form[field.key] ?? 'Activo'} onChange={e => setForm(v => v && ({ ...v, [field.key]: e.target.value }))}><option>Activo</option><option>Inactivo</option></select>
           : field.type === 'units' || field.type === 'departments' ?
           <select required value={form[field.key] ?? ''} onChange={e => setForm(v => v && ({ ...v, [field.key]: Number(e.target.value) }))}>

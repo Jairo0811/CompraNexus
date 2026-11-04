@@ -37,3 +37,13 @@
 .session-email{display:flex;align-items:center;gap:8px;color:#527186;font-size:12px;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:830px){.login-frame{max-width:540px;grid-template-columns:1fr}.login-promo{padding:26px;min-height:205px}.login-promo-copy p,.login-promo-check,.login-academic{display:none}.login-promo-copy h1{font-size:25px;margin:12px 0 0}.login-brand{width:158px;padding:5px;border-radius:12px}.login-form-side{padding:35px 30px 60px}.login-lock{margin-bottom:20px}}
 @media(max-width:540px){.login-shell{padding:12px}.login-frame{border-radius:16px}.login-promo{padding:23px}.login-form-side{padding:28px 22px 54px}.login-form-wrap h2{font-size:27px}.session-email{display:none}.top-session{margin-left:auto}.top-session .button{padding:9px}}
+
+/* Validación dominicana de cédula/RNC en proveedores */
+.tax-id-entry{display:flex;gap:9px;align-items:stretch}
+.tax-id-entry input{min-width:0;flex:1}
+.tax-id-entry .button{flex:none}
+.tax-id-feedback{display:block;line-height:1.5;font-size:12px;margin-top:7px;font-weight:650}
+.tax-id-feedback.valid{color:#13735f}
+.tax-id-feedback.invalid{color:#a7353d}
+.tax-id-hint{display:block;font-size:11px;line-height:1.5;color:#6f8498;margin-top:5px}
+@media(max-width:540px){.tax-id-entry{flex-wrap:wrap}.tax-id-entry .button{width:100%}}
