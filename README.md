@@ -329,6 +329,22 @@ cd CompraNexus
 
 > El arranque recomendado genera una contraseña fuerte únicamente si la de `.env` es inválida y conserva el volumen. No ejecute `docker compose down -v`: eliminaría la base de datos. Si el volumen ya estaba inicializado, la contraseña almacenada no cambia al modificar `.env`; consulte [la recuperación segura de SQL Server](docs/DEPLOYMENT.md). Para restablecer la contraseña del administrador de la aplicación, use [la recuperación local del administrador](docs/ADMIN-RECOVERY.md).
 
+### Acceso al sistema y recuperación del administrador
+
+- **Pantalla de acceso:** [http://localhost:8088/login](http://localhost:8088/login).
+- **Correo del administrador inicial:** se configura localmente mediante `COMPRANEXUS_ADMIN_EMAIL` en `.env`. No hay una cuenta ni una contraseña predeterminadas publicadas en el repositorio.
+- **Contraseña:** se almacena exclusivamente como un hash mediante ASP.NET Core `PasswordHasher<AppUser>`; la contraseña real **nunca se debe incluir en README, commits, issues ni capturas de pantalla**.
+- **Cambio de contraseña:** si el administrador ya existe en `AppUsers`, cambiar `COMPRANEXUS_ADMIN_PASSWORD` en `.env` **no** cambia su contraseña. En el entorno local de desarrollo, utilice el procedimiento interactivo descrito a continuación:
+
+```powershell
+docker compose up --build --no-deps -d api
+docker compose exec api dotnet CompraNexus.Api.dll reset-admin
+```
+
+El comando solicita confirmar el correo y escribir dos veces una contraseña nueva de **14 a 128 caracteres**, sin mostrarla en la terminal. Restablece el bloqueo e invalida las sesiones anteriores sin borrar usuarios ni datos de compras. **No use `-T`** porque requiere entrada interactiva. Consulte [la guía de recuperación administrativa](docs/ADMIN-RECOVERY.md).
+
+Después de recuperar el acceso, retire el valor de `COMPRANEXUS_ADMIN_PASSWORD` del `.env` local (sin borrar el correo) y conserve la nueva contraseña únicamente en un gestor de contraseñas. Si una contraseña quedó expuesta, cámbiela por otra distinta y única.
+
 ### Opción 2 — Desarrollo separado
 
 Con SQL Server accesible:
