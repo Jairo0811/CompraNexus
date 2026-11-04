@@ -16,6 +16,20 @@ jobs:
         run: dotnet restore backend/CompraNexus.slnx
       - name: Build
         run: dotnet build backend/CompraNexus.slnx -c Release --no-restore
+      - name: Admin reset CLI rejects non-interactive input (without HTTP or SQL)
+        shell: bash
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          ConnectionStrings__SqlServer: "Server=127.0.0.1,1;Database=CompraNexus_CI_NoTouch;User Id=placeholder;Password=not-used;Encrypt=True;TrustServerCertificate=True"
+          Auth__BootstrapEmail: "admin@example.test"
+        run: |
+          set +e
+          output=$(dotnet backend/CompraNexus.Api/bin/Release/net10.0/CompraNexus.Api.dll reset-admin 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          test "$status" -eq 2
+          echo "$output" | grep -q "terminal interactiva"
       - name: Start SQL Server (efímero, solo CI)
         run: |
           SA_PASSWORD="Ci-$(openssl rand -hex 12)-Aa1!"
