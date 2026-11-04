@@ -10,7 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+// No enviar el subcomando de mantenimiento al parser HTTP de ASP.NET Core.
+var adminResetMode = args.Length == 1
+    && string.Equals(args[0], "reset-admin", StringComparison.OrdinalIgnoreCase);
+var builder = WebApplication.CreateBuilder(adminResetMode ? [] : args);
 
 var connection = builder.Configuration.GetConnectionString("SqlServer")
     ?? Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
@@ -94,6 +97,13 @@ if (!string.IsNullOrWhiteSpace(keysPath))
 }
 
 var app = builder.Build();
+// Mantenimiento exclusivo de consola: no abre HTTP ni ejecuta el seeding de desarrollo.
+if (adminResetMode)
+{
+    Environment.ExitCode = await AdminRecoveryConsole.RunAsync(
+        app.Services, app.Configuration, app.Environment);
+    return;
+}
 app.UseCors("frontend");
 app.UseAuthentication();
 app.UseAuthorization();
